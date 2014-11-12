@@ -84,10 +84,7 @@ public class ParamFrame extends JFrame
 
 		this.setLocationRelativeTo(this.getOwner());// 弹出窗口居中
 		init();
-	}
-	
-	public void startup()
-	{
+		
 		this.setVisible(true);
 	}
 	
@@ -351,9 +348,4 @@ public class ParamFrame extends JFrame
 		return cancel;
 	}
 
-	
-	public static void main(String[] args)
-	{
-		new ParamFrame().startup();
-	}
 }
