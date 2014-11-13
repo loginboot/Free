@@ -11,6 +11,7 @@ import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,13 +32,9 @@ import com.fc.constant.Constant;
  *
  */
 
-public class ParamFrame extends JFrame
+public class ParamFrame
 {
 	
-	/**
-	 * PF ID
-	 */
-	private static final long serialVersionUID = 1L;
 	
 	//配置信息
 	private static Config cfg = Config.getInstance();
@@ -68,24 +65,30 @@ public class ParamFrame extends JFrame
 	private JButton cancel;
 	
 	private JPanel mypanel;
+	
+	private JDialog jd;
+	
+	private JFrame jf = null;
 
 	@SuppressWarnings("all")
-	public ParamFrame()
+	public ParamFrame(JFrame jf)
 	{
-		this.setTitle("Free Crawler");
-		this.setSize(600, 320);
+		this.jf = jf;
+		jd  = new JDialog(jf,"Setting Parameter",true);
+		jd.setSize(600, 320);
 		// 更改默认图标
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		String path = LoginFrame.class.getClassLoader().getResource("img").getFile();
 		ImageIcon test = new ImageIcon(path + File.separator + "/step.png");
-		this.setIconImage(test.getImage());
-
-		this.setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
-
-		this.setLocationRelativeTo(this.getOwner());// 弹出窗口居中
-		init();
+		jd.setIconImage(test.getImage());
 		
-		this.setVisible(true);
+		jd.setLocationRelativeTo(jd.getOwner());// 弹出窗口居中
+		init();
+	}
+	
+	public JDialog getJd()
+	{
+		return jd;
 	}
 	
 	private void init()
@@ -161,7 +164,7 @@ public class ParamFrame extends JFrame
 		tmp.add(getSave());
 		tmp.add(getCancel());
 		getMyPanbel().add(tmp,BorderLayout.SOUTH);
-		this.getContentPane().add(getMyPanbel());
+		jd.add(getMyPanbel());
 	}
 	
 	private JPanel getMyPanbel()

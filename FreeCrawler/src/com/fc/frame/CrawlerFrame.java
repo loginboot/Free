@@ -5,10 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import com.fc.config.Config;
 
@@ -41,16 +41,25 @@ public class CrawlerFrame extends JFrame
 	
 	private JPanel sc;
 	
+	private JScrollPane scroll;
+	
+	
+	
 	public CrawlerFrame()
 	{
 		
 	}
 	
+	@SuppressWarnings("all")
 	public void startup()
 	{
 		this.setSize(800, 600);
 		setLocationByPlatform(true);
 		this.getContentPane().add(getSc(),BorderLayout.NORTH);
+		this.setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
+		
+		this.setLocationRelativeTo(this.getOwner());// 弹出窗口居中
+		
 		
 		this.setVisible(true);
 	}
@@ -84,13 +93,11 @@ public class CrawlerFrame extends JFrame
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					System.err.println("--->"+pframe);
-					if(pframe==null){
-						pframe = new ParamFrame();
-					}else
+					if(pframe==null)
 					{
-						pframe.show();
+						pframe = new ParamFrame(CrawlerFrame.this);
 					}
+					pframe.getJd().setVisible(true);
 				}
 			});
 		}
