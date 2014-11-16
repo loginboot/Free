@@ -1,9 +1,11 @@
 package com.fc.action;
 
-import org.apache.log4j.Logger;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.apache.log4j.Logger;
 
 import com.fc.config.Config;
 import com.fc.constant.Constant;
@@ -17,11 +19,13 @@ public class CrawlerAction
 	 */
 	private static final Logger logger = Logger.getLogger(CrawlerAction.class);
 	
-	private Console cosole = Console.getInstance();
+	private Console console = Console.getInstance();
 	
 	private Config cfg = Config.getInstance();
 	
 	private ExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	
+	private Map<String,String> pageList = new HashMap<String,String>();
 	
 	public CrawlerAction()
 	{
@@ -44,4 +48,8 @@ public class CrawlerAction
 		
 	}
 	
+	public void shutdown()
+	{
+		scheduler.shutdownNow();
+	}
 }

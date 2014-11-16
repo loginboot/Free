@@ -46,9 +46,11 @@ public class Console
 	public JTextArea getArea(String key)
 	{
 		JTextArea ja = conMap.get(key);
-		if (ja != null)
+		if (ja == null)
 		{
-			ja = new JTextArea();
+			ja = new JTextArea("");
+			ja.setLineWrap(true); // 激活自动换行功能
+			ja.setWrapStyleWord(true); // 激活断行不断字功能
 			conMap.put(key, ja);
 		}
 		return ja;

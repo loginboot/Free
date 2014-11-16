@@ -214,6 +214,18 @@ public class ParamFrame
 			{
 				auto_name_true.setSelected(true);
 			}
+			auto_name_true.addActionListener(new ActionListener()
+			{
+				
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					if(auto_name_true.isSelected())
+					{
+						auto_name_false.setSelected(false);
+					}
+				}
+			});
 		}
 		return auto_name_true;
 	}
@@ -227,6 +239,19 @@ public class ParamFrame
 			{
 				auto_name_false.setSelected(true);
 			}
+			
+			auto_name_false.addActionListener(new ActionListener()
+			{
+				
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					if(auto_name_false.isSelected())
+					{
+						auto_name_true.setSelected(false);
+					}
+				}
+			});
 		}
 		return auto_name_false;
 	}
@@ -251,6 +276,19 @@ public class ParamFrame
 			{
 				sub_folder_true.setSelected(true);
 			}
+			
+			sub_folder_true.addActionListener(new ActionListener()
+			{
+				
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					if(sub_folder_true.isSelected())
+					{
+						sub_folder_false.setSelected(false);
+					}
+				}
+			});
 		}
 		return sub_folder_true;
 	}
@@ -264,6 +302,19 @@ public class ParamFrame
 			{
 				sub_folder_false.setSelected(true);
 			}
+			
+			sub_folder_false.addActionListener(new ActionListener()
+			{
+				
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					if(sub_folder_false.isSelected())
+					{
+						sub_folder_true.setSelected(false);
+					}
+				}
+			});
 		}
 		return sub_folder_false;
 	}
@@ -325,13 +376,42 @@ public class ParamFrame
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					
+					saveParameter();
+					jd.setVisible(false);
+					CrawlerFrame cf = (CrawlerFrame)jf;
+					cf.reflashParameter();
 				}
 			});
 		}
 		return save;
 	}
 	
+	
+	private void saveParameter()
+	{
+		cfg.setProStr(Constant.PROP_URL, url_txt.getText());
+		cfg.setProStr(Constant.PROP_SAVE_PATH, save_path_txt.getText());
+		String at_flag = "false";
+		if(auto_name_true.isSelected())
+		{
+			at_flag ="true";
+		}
+		cfg.setProStr(Constant.PROP_AUTO_NAME, at_flag);
+		String sf_flag="false";
+		if(sub_folder_true.isSelected())
+		{
+			sf_flag ="true";
+		}
+		cfg.setProStr(Constant.PROP_SUB_FOLDER, sf_flag);
+		
+		cfg.setProStr(Constant.PROP_THREAD_SIZE, thread_size_txt.getText());
+		cfg.setProStr(Constant.PROP_SEQ_UUID, seq_uuid_txt.getText());
+		cfg.setProStr(Constant.PROP_BODY_CLASS, body_class_txt.getText());
+		cfg.setProStr(Constant.PROP_PAGE_CLASS, page_class_txt.getText());
+		cfg.setProStr(Constant.PROP_GET_LEVEL, get_level_txt.getText());
+		//持久到文件
+		cfg.saveProStr();
+	}
 	
 	private JButton getCancel()
 	{
@@ -344,7 +424,7 @@ public class ParamFrame
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-					
+					jd.setVisible(false);
 				}
 			});
 		}

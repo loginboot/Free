@@ -3,7 +3,9 @@ package com.fc.config;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -69,4 +71,29 @@ public class Config
 		return this.prop.getProperty(key);
 	}
 
+	/**
+	 * 动态更新配置参数
+	 * @param key
+	 * @param val
+	 */
+	public void setProStr(String key,String val)
+	{
+		this.prop.setProperty(key, val);
+	}
+	
+	/**
+	 * 保存配置参数
+	 */
+	public void saveProStr()
+	{
+		try
+		{
+			OutputStream out = new FileOutputStream(Constant.PROP_PATH_FILE);
+			this.prop.store(out, null);
+			out.close();
+		} catch (Exception e)
+		{
+			logger.error("Save Parameter Info Error:",e);
+		}
+	}
 }
