@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import com.fc.action.CrawlerAction;
 import com.fc.config.Config;
 import com.fc.constant.Constant;
 
@@ -147,6 +148,7 @@ public class CrawlerFrame extends JFrame
 		return cbtn;
 	}
 
+	private CrawlerAction ca;
 	private JButton getStart()
 	{
 		if (start == null)
@@ -158,7 +160,12 @@ public class CrawlerFrame extends JFrame
 				@Override
 				public void actionPerformed(ActionEvent e)
 				{
-
+					if(ca!=null)
+					{
+						ca.shutdown();
+					}
+					ca = new CrawlerAction();
+					ca.startup();
 				}
 			});
 		}
