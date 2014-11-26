@@ -51,8 +51,7 @@ public class ParamFrame
 	
 	private JTextField url_txt;
 	private JTextField save_path_txt;
-	private JRadioButton auto_name_true;
-	private JRadioButton auto_name_false;
+	private JTextField auto_name_txt;
 	private JRadioButton sub_folder_true;
 	private JRadioButton sub_folder_false;
 	private JTextField thread_size_txt;
@@ -110,10 +109,9 @@ public class ParamFrame
 		grid.add(tmp);
 		// auto name
 		tmp = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		auto_name_label = cshow("Is Auto Create Name:");
+		auto_name_label = cshow("Is Stop Pos:");
 		tmp.add(auto_name_label);
-		tmp.add(getAutoNameTrue());
-		tmp.add(getAutoNameFalse());
+		tmp.add(getAutoNameTxt());
 		grid.add(tmp);
 		// thread size
 		tmp = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -205,55 +203,15 @@ public class ParamFrame
 		return save_path_txt;
 	}
 	
-	private JRadioButton getAutoNameTrue()
-	{
-		if(auto_name_true == null)
-		{
-			auto_name_true = new JRadioButton("Yes");
-			if("true".equals(cfg.getPropStr(Constant.PROP_AUTO_NAME)))
-			{
-				auto_name_true.setSelected(true);
-			}
-			auto_name_true.addActionListener(new ActionListener()
-			{
-				
-				@Override
-				public void actionPerformed(ActionEvent e)
-				{
-					if(auto_name_true.isSelected())
-					{
-						auto_name_false.setSelected(false);
-					}
-				}
-			});
-		}
-		return auto_name_true;
-	}
 	
-	private JRadioButton getAutoNameFalse()
+	private JTextField getAutoNameTxt()
 	{
-		if(auto_name_false == null)
+		if(auto_name_txt == null)
 		{
-			auto_name_false = new JRadioButton("No");
-			if("false".equals(cfg.getPropStr(Constant.PROP_AUTO_NAME)))
-			{
-				auto_name_false.setSelected(true);
-			}
-			
-			auto_name_false.addActionListener(new ActionListener()
-			{
-				
-				@Override
-				public void actionPerformed(ActionEvent e)
-				{
-					if(auto_name_false.isSelected())
-					{
-						auto_name_true.setSelected(false);
-					}
-				}
-			});
+			auto_name_txt = new JTextField(cfg.getPropStr(Constant.PROP_STOP_POS));
+			auto_name_txt.setPreferredSize(new Dimension(250, 20));
 		}
-		return auto_name_false;
+		return auto_name_txt;
 	}
 	
 	private JTextField getThreadSizeTxt()
@@ -391,12 +349,7 @@ public class ParamFrame
 	{
 		cfg.setProStr(Constant.PROP_URL, url_txt.getText());
 		cfg.setProStr(Constant.PROP_SAVE_PATH, save_path_txt.getText());
-		String at_flag = "false";
-		if(auto_name_true.isSelected())
-		{
-			at_flag ="true";
-		}
-		cfg.setProStr(Constant.PROP_AUTO_NAME, at_flag);
+		cfg.setProStr(Constant.PROP_STOP_POS, auto_name_txt.getText());
 		String sf_flag="false";
 		if(sub_folder_true.isSelected())
 		{

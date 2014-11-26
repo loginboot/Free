@@ -54,10 +54,12 @@ public class ImageSource implements Runnable
 	private int connTimeout = 60000; // 数据传输超时
 
 	private String ext_app = ".jpg";// 文件后缀
+	private int stop_pos = 0;
 
-	public ImageSource(String uri)
+	public ImageSource(String uri,int stopPos)
 	{
 		this.uri = uri;
+		this.stop_pos = stopPos;
 		hclient = HttpClients.createDefault();
 		// 设置请求和传输超时时间
 		reqCfg = RequestConfig.custom().setSocketTimeout(socketTimeout).setConnectTimeout(connTimeout).build();
@@ -70,6 +72,11 @@ public class ImageSource implements Runnable
 		{
 			saveFile();
 			hclient.close();
+			synchronized (cfg)
+			{
+				cfg.setProStr(Constant.PROP_STOP_POS, String.valueOf(stop_pos));
+				cfg.saveProStr();
+			}
 		} catch (Exception e)
 		{
 			console.log(Constant.LOG_PANEL_CRAWLER, "Get Image From:[" + uri + "] Error...");

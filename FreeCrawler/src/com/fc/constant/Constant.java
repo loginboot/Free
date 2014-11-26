@@ -33,7 +33,7 @@ public class Constant
 	// 线程个数
 	public static final String PROP_THREAD_SIZE = "THREAD_SIZE";
 	// 是否自动生成名称
-	public static final String PROP_AUTO_NAME = "AUTO_NAME";
+	public static final String PROP_STOP_POS = "STOP_POS";
 	// 是否按路径生成子目录
 	public static final String PROP_SUB_FOLDER = "SUB_FOLDER";
 	// 按哪种类生文件名称

@@ -100,7 +100,7 @@ public class CrawlerFrame extends JFrame
 					+ cfg.getPropStr(Constant.PROP_SAVE_PATH);
 			lab1 = getLab(val);
 			top.add(lab1);
-			val = "  Auto Create Name: " + cfg.getPropStr(Constant.PROP_AUTO_NAME) + "    Thread Size: "
+			val = "  Auto Create Name: " + cfg.getPropStr(Constant.PROP_STOP_POS) + "    Thread Size: "
 					+ cfg.getPropStr(Constant.PROP_THREAD_SIZE)
 					+ "    Sub Folder: " + cfg.getPropStr(Constant.PROP_SUB_FOLDER) + "    UUID_SEQ: "
 					+ cfg.getPropStr(Constant.PROP_SEQ_UUID);
@@ -177,7 +177,7 @@ public class CrawlerFrame extends JFrame
 		String val = "  Http: " + cfg.getPropStr(Constant.PROP_URL) + "    Save Path: "
 				+ cfg.getPropStr(Constant.PROP_SAVE_PATH);
 		lab1.setText(val);
-		val = "  Auto Create Name: " + cfg.getPropStr(Constant.PROP_AUTO_NAME) + "    Thread Size: "
+		val = "  Auto Create Name: " + cfg.getPropStr(Constant.PROP_STOP_POS) + "    Thread Size: "
 				+ cfg.getPropStr(Constant.PROP_THREAD_SIZE)
 				+ "    Sub Folder: " + cfg.getPropStr(Constant.PROP_SUB_FOLDER) + "    UUID_SEQ: "
 				+ cfg.getPropStr(Constant.PROP_SEQ_UUID);

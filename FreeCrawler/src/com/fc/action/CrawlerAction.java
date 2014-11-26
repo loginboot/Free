@@ -114,6 +114,11 @@ public class CrawlerAction
 			Document doc = Jsoup.parse(bodyStr);
 			logger.debug("body:"+bodyStr);
 			Elements elst = doc.getElementsByClass(cfg.getPropStr(Constant.PROP_PAGE_CLASS));
+			int stop_pos = 0;
+			if(!Util.isEmpty(cfg.getPropStr(Constant.PROP_STOP_POS)))
+			{
+				stop_pos = Integer.parseInt(cfg.getPropStr(Constant.PROP_STOP_POS));
+			}
 			if(elst!=null && elst.size()>0)
 			{
 				Elements plst = elst.get(0).getElementsByTag("a");
@@ -127,8 +132,13 @@ public class CrawlerAction
 						int end = Integer.parseInt(href.split("\\.")[0]);
 						for(int i=1;i<=end;i++)
 						{
+							//断点数据
+							if(i<stop_pos)
+							{
+								continue;
+							}
 							//pageList.put(i+"", i+".html");
-							ImageSource is = new ImageSource(path+"/"+i+".htm");
+							ImageSource is = new ImageSource(path+"/"+i+".htm",i);
 							scheduler.execute(is);
 						}
 					}
