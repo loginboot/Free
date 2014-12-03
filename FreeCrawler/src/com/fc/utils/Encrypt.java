@@ -114,7 +114,7 @@ public class Encrypt
 //			System.out.println("Please Enter Encrypt Parameters: -d [entrypt string] or -e [concurrent number]");
 //		}
 		
-		String str = "USER:admin|PASSWORD:123456|EXPIRED:20140809";
+		String str = "USER:admin|PASSWORD:123456|EXPIRED:20150606";
 		String tmp = Encrypt.encodeString(str);
 		System.out.println("Ciphertext:"+tmp);
 		

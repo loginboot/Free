@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -77,8 +76,7 @@ public class ParamFrame
 		jd.setSize(600, 320);
 		// 更改默认图标
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		String path = LoginFrame.class.getClassLoader().getResource("img").getFile();
-		ImageIcon test = new ImageIcon(path + File.separator + "/step.png");
+		ImageIcon test = new ImageIcon(Constant.CRAWLER_STEP);
 		jd.setIconImage(test.getImage());
 		
 		jd.setLocationRelativeTo(jd.getOwner());// 弹出窗口居中

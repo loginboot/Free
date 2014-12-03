@@ -11,7 +11,7 @@ public class LicenseAction
 {
 	
 	/*
-	 * 用户License -->USER:admin|PASSWORD:123456|EXPIRED:20140809
+	 * 用户License -->USER:admin|PASSWORD:123456|EXPIRED:20150606
 	 */
 	
 	private String license = "";
@@ -27,12 +27,6 @@ public class LicenseAction
 		{
 			e.printStackTrace();
 		}
-		System.out.println("--->"+license);
-	}
-	
-	public static void main(String[] args)
-	{
-		new LicenseAction();
 	}
 	
 	/**
@@ -60,7 +54,7 @@ public class LicenseAction
 				isOk = false;
 			}
 			
-			String wpwd = lkey[0].split(":")[1];
+			String wpwd = lkey[1].split(":")[1];
 			if(!pwd.equals(wpwd))
 			{
 				isOk = false;
