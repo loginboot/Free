@@ -1,0 +1,130 @@
+package ${model.pkg};
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Entity
+@Table(name = "${model.tableName}")
+public class ${model.name} extends AbstractEntity implements Serializable
+{
+	/**
+	*	${tableName} ID
+	**/
+	private static final long serialVersionUID = 1L;
+#foreach($em in ${model.mdlst})
+
+	private $em.type $em.name;
+#end
+#foreach($med in ${model.mdlst})
+
+#if($med.pkey == 'true' || $med.pkey=='TRUE')
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+#end
+	@Column(name = "$med.name")
+	public $med.type get${med.method}()
+	{
+		return this.$med.name;
+	}
+	
+	public void set${med.method}(${med.type} ${med.name})
+	{
+		this.$med.name = $med.name;
+	}
+#end
+
+#if($model.hasUser == 'true' || $model.hasUser == 'TRUE')
+	// -------------Common Data-----------------
+	private User creatorUser;
+	private String createDate;
+	private User modifierUser;
+	private String lastModifyDate;
+
+	@JsonIgnore
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "creatorId")
+	public User getCreatorUser()
+	{
+		return creatorUser;
+	}
+
+	@Transient
+	public String getCreatorUserName()
+	{
+		if (creatorUser != null)
+		{
+			return creatorUser.getName();
+		}
+		return "";
+	}
+
+	public void setCreatorUser(User creatorUser)
+	{
+		this.creatorUser = creatorUser;
+	}
+
+	@Length(max=26)
+	@Column(name = "createDate")
+	public String getCreateDate()
+	{
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate)
+	{
+		this.createDate = createDate;
+	}
+
+	//@JsonIgnore
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "modifierId")
+	public User getModifierUser()
+	{
+		return modifierUser;
+	}
+
+	@Transient
+	public String getModifierUserName()
+	{
+		if (modifierUser != null)
+		{
+			return modifierUser.getName();
+		}
+		return "";
+	}
+
+	public void setModifierUser(User modifierUser)
+	{
+		this.modifierUser = modifierUser;
+	}
+
+	@Length(max=26)
+	@Column(name = "lastModifyDate")
+	public String getLastModifyDate()
+	{
+		return lastModifyDate;
+	}
+
+	public void setLastModifyDate(String lastModifyDate)
+	{
+		this.lastModifyDate = lastModifyDate;
+	}
+#end
+	
+}

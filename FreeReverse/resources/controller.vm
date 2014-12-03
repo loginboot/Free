@@ -1,0 +1,182 @@
+package $con.pkg;
+
+import java.util.Date;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.apache.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springside.modules.web.Servlets;
+
+@Controller
+@RequestMapping("/$con.home")
+@RequiresAuthentication
+public class $con.name extends BaseController
+{
+	@Resource
+	private $con.serviceType $con.serviceName;
+
+#if($con.auto == 'TRUE' || $con.auto == 'true')
+	//跳转页面
+	@RequestMapping(value="/$con.baseUrl" ,method = RequestMethod.GET)
+	@RequiresPermissions("${con.home}-$con.base")
+	public String forword(HttpServletRequest request, HttpServletResponse response, Model model,
+			RedirectAttributes redirectAttributes)
+	{
+		Util.initPage(request);
+		
+		${con.beanType} ${con.beanName} = new ${con.beanType}();
+		User user = Util.getCurrentUser();
+		${con.beanName}.setCreatorUser(user);
+		${con.beanName}.setModifierUser(user);
+		${con.beanName}.setCreateDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		${con.beanName}.setLastModifyDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		
+		model.addAttribute("$con.beanName", $con.beanName);
+		redirectAttributes.addFlashAttribute("message", "PUB.success");// 显示成功提示
+		return "${con.home}/${con.base}";
+	}
+	
+	//分页列表
+	@RequestMapping(value = "/$con.baseUrl", method = RequestMethod.POST)
+	@ResponseBody
+	@RequiresPermissions("${con.home}-$con.base")
+	public Object getList(HttpServletRequest request, HttpServletResponse response, @RequestParam("page") int page,
+			@RequestParam("pageSize") int pageSize)
+	{
+	
+		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+		Sort sort = null;
+
+		Page<$con.beanType> ls =  ${con.serviceName}.findByPage(page, pageSize, searchParams, sort);
+		// generate search key
+		searchParams.put("page", page);
+		searchParams.put("pageSize", pageSize);
+		Util.storeSearchKeyValue(request, searchParams, "search_");// save
+		return Util.writePagableJson(ls);
+	}
+	
+	//返回一条记录
+	@RequestMapping(value = "/getOne${con.beanType}.do", method = RequestMethod.POST)
+	@ResponseBody
+	@RequiresPermissions("${con.home}-$con.base")
+	public Object getOne${con.beanType}(HttpServletRequest request, HttpServletResponse response,@RequestParam("${con.beanId}") int id)
+	{
+		${con.beanType} ${con.beanName} = ${con.serviceName}.findOneById(id);
+		String resc = "\"result\":"+mapper.toJson(${con.beanName});
+		
+		return  Util.writeJsonSuccMsg(messageSource, request, response, "MSGCODE.0000",resc);
+	}
+	
+	//跳转到新增页面
+	@RequestMapping(value = "/$con.base/add.do", method = RequestMethod.GET)
+	@RequiresPermissions("${con.home}-${con.base}-add")
+	public String getAddForm(HttpServletRequest request, HttpServletResponse response, Model model)
+	{
+		Date times = new Date();
+		${con.beanType} ${con.beanName} = new ${con.beanType}();
+		User user = Util.getCurrentUser();
+		${con.beanName}.setCreatorUser(user);
+		${con.beanName}.setModifierUser(user);
+		${con.beanName}.setCreateDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		${con.beanName}.setLastModifyDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		
+		model.addAttribute("$con.beanName", $con.beanName);
+		model.addAttribute("action", "add");
+		return "${con.home}/${con.base}Form";
+	}
+	
+	@RequestMapping(value = "/$con.base/add.do", method = RequestMethod.POST)
+	@ResponseBody
+	@RequiresPermissions("${con.home}-${con.base}-add")
+	public Object addAjax(HttpServletRequest request, HttpServletResponse response, Model model,
+			 @Valid ${con.beanType} $con.beanName, BindingResult result)
+	{
+		if(result.hasErrors())
+		{
+			return Util.writeJsonValidErrorMsg(messageSource, request, response,result);	
+		}
+		Date times = new Date();
+		${con.beanName}.setCreateDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		${con.beanName}.setLastModifyDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		
+		${con.serviceName}.saveOrUpdate(${con.beanName});//save
+		
+		return  Util.writeJsonSuccMsg(messageSource, request, response, "MSGCODE.0000");
+	}
+	
+	//跳转到修改页面
+	@RequestMapping(value = "/$con.base/upd/{id}.do", method = RequestMethod.GET)
+	@RequiresPermissions("${con.home}-${con.base}-upd")
+	public String getUpdForm(HttpServletRequest request, HttpServletResponse response, Model model,
+							@PathVariable("id") Long id)
+	{
+		${con.beanType} ${con.beanName} = ${con.serviceName}.findOneById(id);
+		User user = Util.getCurrentUser();
+		${con.beanName}.setModifierUser(user);
+		model.addAttribute("$con.beanName", $con.beanName);
+		model.addAttribute("action", "upd");
+		return "${con.home}/${con.base}Form";
+	}
+	
+	@RequestMapping(value = "/$con.base/upd.do", method = RequestMethod.POST)
+	@ResponseBody
+	@RequiresPermissions("${con.home}-${con.base}-upd")
+	public Object updAjax(HttpServletRequest request, HttpServletResponse response, Model model,
+			 @Valid $con.beanType $con.beanName, BindingResult result)
+	{
+		$con.beanType old = ${con.serviceName}.findOneById(${con.beanName}.getId());
+		if(old == null){
+			result.addError(new ObjectError("GLOBAL", "ERRCODE.1013"));
+		}
+		
+		if(result.hasErrors())
+		{
+			return Util.writeJsonValidErrorMsg(messageSource, request, response,result);	
+		}
+		
+		Date times = new Date();
+		${con.beanName}.setLastModifyDate(Util.dateToStr(times, "yyyy-MM-dd HH:mm:ss.SSSSSS"));
+		${con.serviceName}.saveOrUpdate(${con.beanName});//update
+		
+		return  Util.writeJsonSuccMsg(messageSource, request, response, "MSGCODE.0000");
+	}
+	
+	//删除数据
+	@RequestMapping(value = "/$con.base/del.do", method = RequestMethod.POST)
+	@ResponseBody
+	@RequiresPermissions("${con.home}-${con.base}-del")
+	public Object delAjax(HttpServletRequest request, HttpServletResponse response,@RequestParam("$con.beanId") long id)
+	{
+		${con.serviceName}.deleteById(id);
+		return  Util.writeJsonSuccMsg(messageSource, request, response, "MSGCODE.0000");
+	}
+#else
+
+
+#end
+	
+}

@@ -1,0 +1,95 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title><spring:message code="$jsp.title"/></title>
+<%@include file="/WEB-INF/jsp/common.jsp" %>
+</head>
+
+<body>
+	<div id="globalErrSpan"></div> 
+	
+	<div style="margin-left: 10px;">
+		<form id="form" action="${ctx}/$jsp.home/$jsp.base/${action}.do" method="post">
+		    <tags:uuid/>
+		    <input type="hidden" name="${jsp.beanId}"  value="${${jsp.beanName}.${jsp.beanId}}"/>
+		    <input type="hidden" name="lastModifyDate" value="${${jsp.beanName}.lastModifyDate}"/>
+		    <input type="hidden" name="createDate" value="${${jsp.beanName}.createDate}" />
+		    <input type="hidden" name="creatorUser.uId" value="${${jsp.beanName}.creatorUser.uId}"/>
+			<input type="hidden" name="modifierUser.uId" value="${${jsp.beanName}.modifierUser.uId}"/>
+		    
+	    	<fieldset class="user-filedset">
+				<legend class="user-legend"><small><spring:message code="$jsp.title"/>-<spring:message code="${action}"/></small></legend>
+				#foreach($md in $mdlst)
+					#if($md.pkey != 'TRUE' && $md.pkey != 'true')
+					
+					<div class="control-group role-group">
+						<label for="description" class="control-label"><spring:message code="${md.name}"/>:</label>
+						#if($md.type == 'String')
+						<input type="text" id="$md.name" name="$md.name" ${md.regular} value="${ fn:escapeXml(${jsp.beanName}.${md.name})}" #if($md.required == 'true' || $md.required == 'TRUE') required #end class="input-large" />
+						#else
+						<input type="text" id="$md.name" name="$md.name"  ${md.regular} value="${${jsp.beanName}.${md.name}}" #if($md.required == 'true' || $md.required == 'TRUE') required #end class="input-large" />
+						#end
+					</div>	
+					#end
+				#end
+				
+	    	</fieldset>
+		    
+		    <div style="padding-left: 155px; margin-top: 10px;">
+					<input id="submit_btn" class="k-button" type="submit" value="<spring:message code="PUB.submit"/>"/>&nbsp;	
+					<input id="cancel_btn" class="k-button" type="button" value="<spring:message code="PUB.return"/>" onclick="getBack()"/>
+			</div>
+		</form>
+	</div>
+
+<script type="text/javascript">
+
+$(function(){
+	//聚焦第一个输入框
+	$("input:visible:enabled:first").focus();
+	$("#form").validate({
+		submitHandler: function(form) 
+		{
+			jQuery(form).ajaxSubmit(
+			{
+				type:"post",
+				dataType : 'json',
+				success : function(data) 
+				{
+					isOk = lyodsAjaxCheck(data);
+					if(isOk==true)//成功也进行提示
+					{
+						//alert("success:"+data.retmsg.MSG);
+						window.location.href="${ctx}/$jsp.home/$jsp.baseUrl";
+						return;
+					}				
+				},
+				error : lyodsAjaxError
+			});
+		}
+	});
+	
+	$("#form").find("div.control-group").click(function(e){
+		var e = e||window.event,
+			curr = e.target||e.srcElement;
+		if(curr.tagName=='SPAN' || curr.className=="error"){
+			$(curr).slideToggle("fast");	
+		}
+	});
+});
+
+//返回
+function getBack(){
+	window.location.href="${ctx}/$jsp.home/$jsp.baseUrl";
+}
+
+</script>
+	
+</body>

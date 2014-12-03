@@ -1,0 +1,6 @@
+package ${dao.pkg};
+
+public interface ${dao.name} extends #if($dao.page == 'true' || $dao.page== 'TRUE') PagingAndSortingRepository<$dao.beanName,Long>,JpaSpecificationExecutor<$dao.beanName> #else CrudRepository<$dao.beanName,Long> #end
+{
+
+}

@@ -1,0 +1,24 @@
+
+-- table 
+if(exists(select * from sys.tables where name='${model.tableName}'))
+	drop table ${model.tableName}
+go
+
+create table ${model.tableName}(
+#foreach($d in $model.mdlst)
+	$d.name #if($d.type=='long' || $d.type=='Long' || $d.type=='int' || $d.type=='Integer') int #else if($d.type=='String') nvarchar($d.maxSize) #else if($d.type=='Date') datetime #else if($d.type=='BigDecimal') decimal(2,18) #end #if($d.pkey == 'true' || $d.pkey == 'TRUE')  #end ,
+	#if($model.hasUser == 'true' || $model.hasUser == 'TRUE')
+	creatorId int foreign key references T_USER(uId) not null,
+	createDate char(26) not null,
+	modifierId int foreign key references T_USER(uId) not null,
+	lastModifyDate char(26) not null
+	#end
+#end
+)
+go
+
+-- menu
+SET IDENTITY_INSERT T_MENU ON;
+
+
+SET IDENTITY_INSERT T_MENU OFF;

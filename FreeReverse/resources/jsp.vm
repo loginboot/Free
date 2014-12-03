@@ -1,0 +1,344 @@
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title><spring:message code="$jsp.title"/></title>
+<%@include file="/WEB-INF/jsp/common.jsp" %>
+</head>
+
+<body>
+
+<div class="nf-search">
+	<strong>
+		<spring:message code="PUB.location" />
+		<img src="${ctx}/statics/styles/images/arrow.png" alt="loading">
+		<span><spring:message code="$jsp.title"/></span></strong>
+	<form id="searchForm">
+		#foreach($ser in $mdlst)
+			#if($ser.search == 'true' || $ser.search == 'TRUE')
+			<label><spring:message code="${jsp.base}.${ser.name}" /></label>
+			<input type="text" name="search_LIKE_${ser.name}" value="${ fn:escapeXml(search_LIKE_${ser.name})}" />
+			#end
+		#end
+		<button class="k-button" type="button" onclick="search()"><spring:message code="PUB.search"/></button>
+		<button class="k-button" type="button" onclick="search('all')"><spring:message code="PUB.all"/></button>
+	</form>
+</div>
+	
+<!-- out ajax table -->
+<div class="baseGrid" ></div>
+
+<div style="text-align: right; margin-top: 5px;">
+	#if($jsp.auto == 'TRUE' || $jsp.auto == 'true')
+	<shiro:hasPermission name="${jsp.home}-${jsp.base}-add">
+	<button class="k-button" onclick="add();"><spring:message code="PUB.action1"/></button>
+	</shiro:hasPermission>
+	
+	<shiro:hasPermission name="${jsp.home}-${jsp.base}-upd">
+	<button class="k-button" onclick="upd()"><spring:message code="PUB.action2"/></button>
+	</shiro:hasPermission>
+	
+	<shiro:hasPermission name="${jsp.home}-${jsp.base}-del">
+	<button class="k-button" onclick="del()" ><spring:message code="PUB.action3"/></button>
+	</shiro:hasPermission>	
+	
+	<button class="k-button" onclick="view()" ><spring:message code="PUB.view"/></button>
+	#else
+		#foreach($pd in $jdlst)
+		<shiro:hasPermission name="$pd.permission">
+		<button class="k-button" onclick="$pd.method()" ><spring:message code="$pd.lang"/></button>
+		</shiro:hasPermission>	
+		#end
+	#end
+</div>
+
+#if($jsp.singlePage == 'true' || $jsp.singlePage == 'TRUE')
+
+<!-- action form -->
+<div id="baseDiv">
+	<h3><spring:message code="${jsp.title}" /></h3>
+	<form id="baseForm" name="baseForm" >
+		<input type="hidden" name="${jsp.beanId}"  value="${${jsp.beanName}.${jsp.beanId}}"/>
+	    <input type="hidden" name="lastModifyDate" value="${${jsp.beanName}.lastModifyDate}"/>
+	    <input type="hidden" name="createDate" value="${${jsp.beanName}.createDate}" />
+	    <input type="hidden" name="creatorUser.uId" value="${${jsp.beanName}.creatorUser.uId}"/>
+		<input type="hidden" name="modifierUser.uId" value="${${jsp.beanName}.modifierUser.uId}"/>
+		
+		<table class="ly-table">
+			<thead>
+				<tr>
+					<th><spring:message code="PUB.fileName" /></th>
+					<th><spring:message code="PUB.data" /></th>
+				</tr>
+			<thead>
+			<tbody>
+		#foreach($fd in $mdlst)
+			#if($fd.pkey != 'TRUE' && $fd.pkey != 'true')
+	<tr>
+		<td><spring:message code="${jsp.base}.${fd.name}" /></td>
+		
+		<td>
+		#if($fd.type == 'String')
+	<input type="text" id="$fd.name" name="$fd.name" ${fd.regular} value="${ fn:escapeXml(${jsp.beanName}.${fd.name})}" #if($fd.required == 'true' || $fd.required == 'TRUE') required #end class="input-large" />
+		#else
+	<input type="text" id="$fd.name" name="$fd.name" ${fd.regular} value="${${jsp.beanName}.${fd.name}}" #if($fd.required == 'true' || $fd.required == 'TRUE') required #end class="input-large" />
+		#end
+		</td>
+		
+	</tr>
+			#end
+		#end
+			</tbody>
+		</table>
+		<div align="center" id="spf_action">
+			<button id="isOk" class="k-button" type="submit"><spring:message code="PUB.ok" /></button>
+			<button id="isCancel" class="k-button" type="button"><spring:message code="PUB.cancel" /></button>
+			<button class="k-button" id="closeBtn" name="okClose" type="button"><spring:message code="PUB.close" /></button>
+		</div>
+	</form>
+</div>
+
+#end
+
+<script type="text/javascript">
+#if($jsp.singlePage == 'true' || $jsp.singlePage == 'TRUE')
+//window init div form
+var base_Win = $("#baseDiv").kendoWindow({
+				title : "<spring:message code='PUB.action1'/>",
+				draggable : true,	
+				width : "500px",
+				height:"340px",
+				visible : false,
+				modal : true,
+				actions : [ "Maximize", "Close" ]
+			}).data("kendoWindow");
+			
+//validate form
+var baseForm = $("#baseForm").validate({
+	submitHandler: function(form){			
+		jQuery(form).ajaxSubmit({				
+			type:"post",
+			dataType : 'json',
+			success : function(data){
+				isOk = lyodsAjaxCheck(data);
+				if(isOk==true)//成功也进行提示
+				{
+					base_Win.close();
+					baseData.read();
+				}				
+			},
+			error : lyodsAjaxError
+		});
+	}
+});
+
+//get one
+window.getOneBase=function(url){
+	jQuery.ajax({
+		type : 'POST',
+		url : url,
+		dataType : 'json',
+		success : function(data) {
+			isOk = lyodsAjaxCheck(data);
+			if(isOk==true)//成功也进行提示
+			{
+				baseForm.resetForm();
+				#foreach($md in $mdlst)
+document.baseForm.${md.name}.value=data.result.${md.name};
+				#end
+				
+				document.baseForm.createDate.value=data.result.createDate;
+				document.baseForm.lastModifyDate.value=data.result.lastModifyDate;
+				base_Win.center();
+				base_Win.open();
+			}
+		},
+		error : lyodsAjaxError
+	});
+};
+
+//add action
+window.add=function(){
+	baseForm.resetForm();
+	$("#baseForm")[0].reset();
+	document.baseForm.${jsp.beanId}.value=0;
+	$("input,select",$("#baseForm")).attr("disabled",false);
+	$("#baseForm").attr("action","${ctx}/${jsp.home}/$jsp.base/add.do");	
+	isActionButton("add");
+	base_Win.title("<spring:message code='PUB.action1'/>");
+	base_Win.center();
+	base_Win.open();
+};
+
+//upd action
+window.upd=function(){
+	if(current[0] == undefined){
+		alert("<spring:message code='PUB.nonselected'/>");
+		return;
+	}
+	isActionButton("upd");
+	$("input,select",$("#baseForm")).attr("disabled",false);
+	$("#baseForm").attr("action","${ctx}/${jsp.home}/$jsp.base/upd.do");	
+	base_Win.title("<spring:message code='PUB.action2' />");
+	getOneBase("${ctx}/${jsp.home}/getOne${jsp.beanType}.do?${jsp.beanId}="+current[0]);
+};
+
+//veiw
+window.view=function(){
+	if(current[0] == undefined){
+		alert("<spring:message code='PUB.nonselected'/>");
+		return;
+	}
+	isActionButton("view");
+	$("input,select",$("#baseForm")).attr("disabled",true);
+	base_Win.title("<spring:message code='PUB.view' />");
+	getOneBase("${ctx}/${jsp.home}/getOne${jsp.beanType}.do?${jsp.beanId}="+current[0]);
+};
+
+//通过事件控制要显示的button
+function isActionButton(act){
+	//1.ok 2.cancel 3.close
+	var btns = $("#spf_action>button");
+	switch(act){
+	case 'add':
+		$(btns[0]).show();
+		$(btns[1]).show();
+		$(btns[2]).hide();
+		break;
+	case 'upd':
+		$(btns[0]).show();
+		$(btns[1]).show();
+		$(btns[2]).hide();
+		break;
+	case 'view':
+		$(btns[0]).hide();
+		$(btns[1]).hide();
+		$(btns[2]).show();
+		break;
+	}
+}
+
+$("#isCancel").click(function(e){
+	base_Win.close();
+});
+$("#closeBtn").click(function(e){
+	base_Win.close();
+});
+
+#end
+
+jQuery(function($){
+	//colunms 列数
+	var getCols = [];
+	#foreach($col in $mdlst)
+	getCols.push({
+				template:"#=dateConvert(${col.name})#",
+				title:"<spring:message code='${jsp.base}.${col.name}' />"
+				});
+	#end
+	
+	//dataSource
+	var baseData =  new kendo.data.DataSource({//data source
+		transport : {
+			read : {
+				url : "${ctx}/${jsp.home}/${jsp.baseUrl}",
+				dataType : "json",
+				type:"post",
+				 data: function() {
+                     return $("#searchForm").serializeJson();
+                 }
+			}
+		},
+		schema : { //对应接收参数转换为原始格式
+			data : function(data) {
+				return data.rows;
+			},
+			total : function(data) {
+				return data.total;
+			}
+		},
+		page:"${page}",
+		pageSize : "${pageSize}",
+		serverPaging : true
+	});
+	
+	window.baseData = baseData;
+	
+	//init kendo grid and window
+	var grid = $(".baseGrid").kendoGrid({
+			dataSource : baseData,
+			change : onChange,
+			dataBound:ondatabound,
+			selectable : "row",
+			scrollable : false,
+			sortable : false,
+			pageable: {
+                input: true,
+                numeric: false,
+                refresh: true,
+                pageSizes: true
+            },
+			columns : getCols}).data("kendoGrid");
+			
+	//search
+	window.search=function(param){
+		if("all"==param){
+			$("#searchForm").clearForm();
+		}
+		baseData.read();
+	};
+
+#if($jsp.singlePage != 'true' && $jsp.singlePage != 'TRUE')
+	#if($jsp.auto == 'TRUE'  || $jsp.auto == 'true')
+		//button action bar function---------------------
+		window.add=function(){
+			window.location.href="${ctx}/${jsp.home}/$jsp.base/add.do";
+		};
+		
+		window.upd=function(){
+			if(current[0]==undefined){
+				alert("<spring:message code='PUB.nonselected'/>");
+				return;
+			}
+			window.location.href="${ctx}/${jsp.home}/$jsp.base/upd/"+current[0]+".do";
+		};
+	#end
+#end
+	
+	//del action
+	window.del=function(){
+		if(current[0]==undefined){
+			alert("<spring:message code='PUB.nonselected'/>");
+			return;
+		}
+		if(confirm("<spring:message code='PUB.confirmDelete'/>")){
+			jQuery.ajax({
+				type : 'POST',
+				data:{${jsp.beanId} : current[0]},
+				url : "${ctx}/${jsp.home}/$jsp.base/del.do",
+				dataType : 'json',
+				success : function(data) {
+					isOk = lyodsAjaxCheck(data);
+					if(isOk==true)//成功也进行提示
+					{
+						alert("success:"+data.retmsg.MSG);
+						baseData.read();
+						return;
+					}				
+				},
+				error : lyodsAjaxError
+			});
+		}
+	};
+
+});
+</script>
+	
+</body>
+
+</html>

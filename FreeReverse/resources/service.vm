@@ -1,0 +1,55 @@
+package ${service.pkg};
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+@Service
+public class $service.name extends BaseService
+{
+	@Resource
+	private $service.daoType $service.daoName;
+
+#if($service.auto == 'TRUE' || $service.auto == 'true')
+	
+	public Page<$service.beanType> findByPage(int page,int pageSize,Map<String, Object> searchParams,Sort sort)
+	{
+		if(sort==null)
+    	{
+    		sort =  new Sort(Direction.ASC, "$service.beanId");
+    	}
+    	
+    	PageRequest pageRequest = new PageRequest(page - 1, pageSize,sort);
+        return ${service.daoName}.findAll((Specification<${service.beanType}>)buildSpecification(searchParams,${service.beanType}.class),pageRequest);
+	}
+	
+	
+	public $service.beanType findOneById(long id)
+	{
+		return ${service.daoName}.findOne(id);
+	}
+	
+	
+	public void saveOrUpdate( $service.beanType $service.beanName )
+	{
+		${service.daoName}.save( $service.beanName );
+	}
+	
+	public void deleteById(long id)
+	{
+		${service.daoName}.delete(id);
+	}
+
+#else
+
+#end
+
+
+}
